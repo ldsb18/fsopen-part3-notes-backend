@@ -24,6 +24,12 @@ let persons = [
     }
 ]
 
+const RANDOM_RANGE = 100000000;
+
+const randomId = () => {
+    return Math.floor(Math.random() * RANDOM_RANGE) + 4;//+ 4 so randomId func doesn't override id 1-4 
+}
+
 app.use(express.json());
 
 app.get('/', (request, response) => {
@@ -70,6 +76,26 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+
+    if (!(body.number && body.name)) {
+        console.log('HTTP 400, missing information');
+        return response.status(400).json({
+            error: 'Name or number are missing'
+        })
+    }
+    
+    const newPerson = {
+        name: body.name,
+        number: body.number,
+        id: randomId()
+    }
+
+    console.log('HTTP 200, success');
+    persons = persons.concat(newPerson)
+    response.json(newPerson);
+})
 
 const PORT = 3001;
 app.listen(PORT, () => {
