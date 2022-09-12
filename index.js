@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express();
 
-let contacts = [
+let persons = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -41,6 +41,20 @@ app.get('/info', (request, response) => {
 
 app.get('/api/persons', (request, response) => {
     response.json(contacts);
+})
+
+app.get('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+
+    const person = persons.find( n => n.id === id);
+
+    if(!person){
+        console.log('HTTP 404, not found');
+        response.status(404).end()
+    } else {
+        console.log('HTTP 200, success');
+        response.json(person)
+    }
 })
 
 const PORT = 3001;
