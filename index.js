@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express();
 
 let persons = [
@@ -24,13 +25,26 @@ let persons = [
     }
 ]
 
+
 const RANDOM_RANGE = 100000000;
 
 const randomId = () => {
     return Math.floor(Math.random() * RANDOM_RANGE) + 4;//+ 4 so randomId func doesn't override id 1-4 
 }
 
+
+const requestDataSent = (request, response, next) => {
+    request.datasent = request.body;
+    next()
+}
+
+morgan.token('datasent', (request) => {
+    return JSON.stringify(request.datasent);
+})
+
+app.use(morgan(':method :url :status :res[content/length] :response-time ms :datasent'))
 app.use(express.json());
+app.use(requestDataSent)
 
 app.get('/', (request, response) => {
     console.log('HTTP 200, home page retrieved');
@@ -101,6 +115,8 @@ app.post('/api/persons', (request, response) => {
     persons = persons.concat(newPerson)
     response.json(newPerson);
 })
+
+
 
 const PORT = 3001;
 app.listen(PORT, () => {

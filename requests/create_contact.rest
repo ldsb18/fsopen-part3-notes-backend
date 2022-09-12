@@ -1,7 +1,10 @@
+GET http://localhost:3001/api/persons/
+
+###
 POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Lautaro el loco",
-    "number": "3471-628328"
+    "name": "asd el loco",
+    "number": "3471-2534"
 }
