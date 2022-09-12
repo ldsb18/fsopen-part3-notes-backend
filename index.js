@@ -27,20 +27,24 @@ let persons = [
 app.use(express.json());
 
 app.get('/', (request, response) => {
+    console.log('HTTP 200, home page retrieved');
     response.send('<h1>Welcome to contacts API</h1>');
 })
 
 app.get('/info', (request, response) => {
     const date = new Date()
 
+    console.log('HTTP 200, info retrieved');
+
     response.send(`
-        <p>Phonebook has info for ${contacts.length} people</p>
+        <p>Phonebook has info for ${persons.length} people</p>
         <p>${date}</p>
     `)
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(contacts);
+    console.log('HTTP 200, persons json retrieved');
+    response.json(persons);
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -56,6 +60,16 @@ app.get('/api/persons/:id', (request, response) => {
         response.json(person)
     }
 })
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+
+    persons = persons.filter(n => n.id !== id);
+
+    console.log(id, 'HTTP 204, contact deleted');
+    response.status(204).end()
+})
+
 
 const PORT = 3001;
 app.listen(PORT, () => {
