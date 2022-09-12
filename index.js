@@ -30,6 +30,15 @@ app.get('/', (request, response) => {
     response.send('<h1>Welcome to contacts API</h1>');
 })
 
+app.get('/info', (request, response) => {
+    const date = new Date()
+
+    response.send(`
+        <p>Phonebook has info for ${contacts.length} people</p>
+        <p>${date}</p>
+    `)
+})
+
 app.get('/api/persons', (request, response) => {
     response.json(contacts);
 })
