@@ -25,7 +25,6 @@ let persons = [
     }
 ]
 
-
 const RANDOM_RANGE = 100000000;
 
 const randomId = () => {
@@ -44,17 +43,19 @@ morgan.token('datasent', (request) => {
 
 app.use(morgan(':method :url :status :res[content/length] :response-time ms :datasent'))
 app.use(express.json());
+app.use(express.static('build'))
+
 app.use(requestDataSent)
 
 app.get('/', (request, response) => {
-    console.log('HTTP 200, home page retrieved');
+    console.log('LOG: HTTP 200, home page retrieved');
     response.send('<h1>Welcome to contacts API</h1>');
 })
 
 app.get('/info', (request, response) => {
     const date = new Date()
 
-    console.log('HTTP 200, info retrieved');
+    console.log('LOG: HTTP 200, info retrieved');
 
     response.send(`
         <p>Phonebook has info for ${persons.length} people</p>
@@ -63,7 +64,7 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    console.log('HTTP 200, persons json retrieved');
+    console.log('LOG: HTTP 200, persons json retrieved');
     response.json(persons);
 })
 
@@ -73,10 +74,10 @@ app.get('/api/persons/:id', (request, response) => {
     const person = persons.find( n => n.id === id);
 
     if(!person){
-        console.log('HTTP 404, not found');
+        console.log('LOG: HTTP 404, not found');
         response.status(404).end()
     } else {
-        console.log('HTTP 200, success');
+        console.log('LOG: HTTP 200, success');
         response.json(person)
     }
 })
@@ -86,7 +87,7 @@ app.delete('/api/persons/:id', (request, response) => {
 
     persons = persons.filter(n => n.id !== id);
 
-    console.log(id, 'HTTP 204, contact deleted');
+    console.log(id, 'LOG: HTTP 204, contact deleted');
     response.status(204).end()
 })
 
@@ -94,12 +95,12 @@ app.post('/api/persons', (request, response) => {
     const body = request.body;
 
     if (!(body.number && body.name)) {
-        console.log('HTTP 400, missing information');
+        console.log('LOG: HTTP 400, missing information');
         return response.status(400).json({
             error: 'Name or number are missing'
         })
     } else if(persons.find(p => p.name === body.name)) {
-        console.log('HTTP 400, name already exists');
+        console.log('LOG: HTTP 400, name already exists');
         return response.status(400).json({
             error: 'name must be unique'
         })
@@ -111,11 +112,10 @@ app.post('/api/persons', (request, response) => {
         id: randomId()
     }
 
-    console.log('HTTP 200, success');
+    console.log('LOG: HTTP 200, success');
     persons = persons.concat(newPerson)
     response.json(newPerson);
 })
-
 
 
 const PORT = 3001;
