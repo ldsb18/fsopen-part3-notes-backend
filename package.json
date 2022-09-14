@@ -7,7 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf build && cd ../../learning/part2/exercises/phonebook/ && npm run build && cp -r build ../../../../Backend/fsopen-part3-notes-backend"
+    "build:ui": "rm -rf build && cd ../../learning/part2/exercises/phonebook/ && npm run build && cp -r build ../../../../Backend/fsopen-part3-notes-backend",
+    "deploy": "flyctl deploy",
+    "deploy:full": "npm run build:ui && npm run deploy"
   },
   "repository": {
     "type": "git",
