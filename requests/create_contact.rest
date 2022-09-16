@@ -1,13 +1,30 @@
-GET https://fsopen-phonebook-backend.fly.dev/api/persons/
-
-###
-POST https://fsopen-phonebook-backend.fly.dev/api/persons/
+//POST request without error
+POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
     "name": "asd el loco",
     "number": "3471-2534"
 }
+//expected ==> HTTP 200 / JSON format person
+
 
 ###
-DELETE https://fsopen-phonebook-backend.fly.dev/api/persons/24516642
+//POST request with client-side error
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "only name, no number"
+}
+//expected ==> HTTP 400 / MissingInfo: Missing number
+
+###
+//POST request with client-side error
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "number": "only number, no name"
+}
+//expected ==> HTTP 400 / MissingInfo: Missing name

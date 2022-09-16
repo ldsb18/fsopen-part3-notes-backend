@@ -1,1 +1,10 @@
-DELETE http://localhost:3001/api/persons/2
+//DELETE request without error - The ID is mannualy took from the database
+DELETE http://localhost:3001/api/persons/6324cd90a952f8057d974fb3
+//expected ==> HTTP 200 / JSON format person
+
+
+###
+//DELETE request with client-side error
+DELETE http://localhost:3001/api/persons/2985729384adb831
+
+//expected ==> HTTP 400 / error: malformatted id
