@@ -48,11 +48,13 @@ const unknownEndpoint = (request, response) => {
 
 const errorHandler = (error, request, response, next) => {
 	
-	console.log(error);
+	console.log(error.message);
 
 	if(error.name === 'CastError') {
 		return response.status(400).send({ error: 'malformatted id'})
 	} else if (error.name === 'ValidationError') {
+		return response.status(400).send({ error: error.message})
+	} else if (error.name === 'MatchingNumber') {
 		return response.status(400).send({ error: error.message})
 	}
 
@@ -130,9 +132,20 @@ app.post('/api/persons', (request, response, next) => {
 		number: number === undefined ? null : number
 	})
 
-	newPerson.save()
-		.then( savedPerson => response.json(savedPerson))
-		.catch( err => next(err))
+	Person.find({ number: newPerson.number })
+		.then( result => {
+			if (result.length === 0) {
+				newPerson.save()
+					.then( savedPerson => response.json(savedPerson))
+					.catch( err => next(err))
+			} else {
+				const error = new Error('The number is already in phonebook');
+				error.name = 'MatchingNumber';
+				return next(error);
+			}
+		})
+
+
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
