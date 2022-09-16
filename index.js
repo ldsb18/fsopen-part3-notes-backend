@@ -46,6 +46,16 @@ const unknownEndpoint = (request, response) => {
 	})
 }
 
+const errorHandler = (error, request, response, next) => {
+    console.log(error);
+
+    if(error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id'})
+    }
+
+    next(error);
+}
+
 morgan.token('datasent', (request) => {
     return JSON.stringify(request.datasent);
 })
@@ -65,50 +75,52 @@ app.get('/info', (request, response) => {
     const date = new Date()
     console.log('LOG: HTTP 200, info retrieved');
 
-    Person.find({}).then(people => {
-        response.send(`
-            <p>Phonebook has info for ${people.length} people</p>
-            <p>${date}</p>
-        `)
-    })
+    Person.find({})
+        .then(people => {
+            response.send(`
+                <p>Phonebook has info for ${people.length} people</p>
+                <p>${date}</p>
+            `)
+        })
+        .catch( err => console.log(err))
 
-})//al toque mi rey
+})
 
 app.get('/api/persons', (request, response) => {
-    Person.find({}).then( people => {
+    Person.find({})
+        .then( people => {
         console.log('LOG: HTTP 200, persons json retrieved');
 
         response.json(people);
-    })
+        })
+        .catch( err => console.log(err))
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const _id = Number(request.params.id);
-
-    Person.find({}).then(people => {
-
-        //console.log(JSON.stringify(people, null, '\t'));
-
-        if(!people[_id]){
-            console.log('LOG: HTTP 404, not found');
-            response.status(404).end()
-        } else {
-            console.log('LOG: HTTP 200, success');
-            response.json(people[_id])
-        }
-    })
+	Person.findById(request.params.id)
+		.then( person => {
+			if (note) {
+				response.json(person);
+			} else {
+				response.status(404).end();
+			}
+		})
+		.catch( err => {
+			console.log(err);
+			response.status(500).end();
+		})	
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id);
-
-    persons = persons.filter(n => n.id !== id);
-
-    console.log(id, 'LOG: HTTP 204, contact deleted');
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    
+    Person.findByIdAndDelete(request.params.id)
+        .then( result => {
+            response.status(204).end();
+        })
+        .catch( err => next(err) )
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
     if (!(body.number && body.name)) {
@@ -124,10 +136,13 @@ app.post('/api/persons', (request, response) => {
     })
 
     console.log('LOG: HTTP 200, success');
-    newPerson.save().then( savedPerson => response.json(savedPerson));
+    newPerson.save()
+        .then( savedPerson => response.json(savedPerson))
+        .catch( err => next(err))
 })
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
