@@ -1,19 +1,19 @@
 //PUT request without error  - The ID is mannualy took from the database
-PUT http://localhost:3001/api/persons/632265112edfa1ca9a7f673d
+PUT http://localhost:3001/api/persons/63226520461b6042eff802e5
 Content-Type: application/json
 
 {
-    "number": "3471-2534"
+    "number": "347"
 }
 //expected ==> HTTP 200 / JSON format person
 
 
 ###
 //PUT request with client-side error - The ID is mannualy took from the database
-PUT http://localhost:3001/api/persons/632265112edfa1ca9a7f673d
+PUT http://localhost:3001/api/persons/63226520461b6042eff802e5
 Content-Type: application/json
 
 {
-    "sorry": "only name, no number"
+    "name": "Lautarodeanus"
 }
-//expected ==> HTTP 200 / JSON format person
+//expected ==> HTTP 400 / error: Validation error

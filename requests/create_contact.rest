@@ -17,7 +17,7 @@ Content-Type: application/json
 {
     "name": "only name, no number"
 }
-//expected ==> HTTP 400 / MissingInfo: Missing number
+//expected ==> HTTP 400 / Validation failed
 
 ###
 //POST request with client-side error
@@ -27,4 +27,4 @@ Content-Type: application/json
 {
     "number": "only number, no name"
 }
-//expected ==> HTTP 400 / MissingInfo: Missing name
+//expected ==> HTTP 400 / Validation failed

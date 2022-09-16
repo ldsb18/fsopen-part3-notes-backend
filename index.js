@@ -52,17 +52,13 @@ const errorHandler = (error, request, response, next) => {
 
 	if(error.name === 'CastError') {
 		return response.status(400).send({ error: 'malformatted id'})
-	}
-
-	if(error.name === 'MissingInfo') {
-		return response.status(400).send({ error: 'Missing information'})
-	}
-	if(error.name === 'NoNumber') {
-		return response.status(400).send({ error: 'Bad request - no number registered'})
+	} else if (error.name === 'ValidationError') {
+		return response.status(400).send({ error: error.message})
 	}
 
 	next(error);
 }
+
 
 morgan.token('datasent', (request) => {
 	return JSON.stringify(request.datasent);
@@ -126,19 +122,12 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.post('/api/persons', (request, response, next) => {
-	const body = request.body;
-
-	if (!(body.number && body.name)) {
-		const message = body.name === (undefined || '') ? 'Missing Name' : 'Missing number';
-		const error = new Error(message)
-		error.name = 'MissingInfo';
-
-		throw error;
-	}
+	
+	const { name, number } = request.body;
 
 	const newPerson = new Person({
-		name: body.name,
-		number: body.number,
+		name: name === undefined ? null : name,
+		number: number === undefined ? null : number
 	})
 
 	newPerson.save()
@@ -148,19 +137,17 @@ app.post('/api/persons', (request, response, next) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
 
-	const body = request.body;
+	const { name, number } = request.body;
 
 	const person = {
-		number: body.number,
+		name: name === undefined ? null : name,
+		number: number === undefined ? null : number
 	}
 
-	if(body.number === undefined){
-		const error = new Error('No number')
-		error.name = 'NoNumber'
-		throw error;
-	}
-	
-	Person.findByIdAndUpdate(request.params.id, person, { new: true })
+	Person.findByIdAndUpdate(
+		request.params.id, 
+		person, 
+		{ new: true, runValidators: true, context: 'query'})
 		.then( updatedPerson => {
 			response.json(updatedPerson);
 		})
