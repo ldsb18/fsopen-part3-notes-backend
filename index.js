@@ -57,6 +57,9 @@ const errorHandler = (error, request, response, next) => {
 	if(error.name === 'MissingInfo') {
 		return response.status(400).send({ error: 'Missing information'})
 	}
+	if(error.name === 'NoNumber') {
+		return response.status(400).send({ error: 'Bad request - no number registered'})
+	}
 
 	next(error);
 }
@@ -76,7 +79,7 @@ app.get('/', (request, response) => {
 	response.send('<h1>Welcome to contacts API</h1>');
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
 	const date = new Date()
 	console.log('LOG: HTTP 200, info retrieved');
 
@@ -91,17 +94,17 @@ app.get('/info', (request, response) => {
 
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
 	Person.find({})
 		.then( people => {
-		console.log('LOG: HTTP 200, persons json retrieved');
+			console.log('LOG: HTTP 200, persons json retrieved');
 
-		response.json(people);
+			response.json(people);
 		})
 		.catch( err => next(err))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
 	Person.findById(request.params.id)
 		.then( person => {
 			if (note) {
@@ -126,7 +129,7 @@ app.post('/api/persons', (request, response, next) => {
 	const body = request.body;
 
 	if (!(body.number && body.name)) {
-		const message = body.name === undefined ? 'Missing Name' : 'Missing number';
+		const message = body.name === (undefined || '') ? 'Missing Name' : 'Missing number';
 		const error = new Error(message)
 		error.name = 'MissingInfo';
 
@@ -140,6 +143,27 @@ app.post('/api/persons', (request, response, next) => {
 
 	newPerson.save()
 		.then( savedPerson => response.json(savedPerson))
+		.catch( err => next(err))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+
+	const body = request.body;
+
+	const person = {
+		number: body.number,
+	}
+
+	if(body.number === undefined){
+		const error = new Error('No number')
+		error.name = 'NoNumber'
+		throw error;
+	}
+	
+	Person.findByIdAndUpdate(request.params.id, person, { new: true })
+		.then( updatedPerson => {
+			response.json(updatedPerson);
+		})
 		.catch( err => next(err))
 })
 

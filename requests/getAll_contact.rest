@@ -6,4 +6,4 @@ GET http://localhost:3001/api/persons
 ###
 //GET request with error
 GET http://localhost:3001/api/person
-//expected ==> "unknown endpoint"
+//expected ==> HTTP 400 / "unknown endpoint"
