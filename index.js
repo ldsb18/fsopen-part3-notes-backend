@@ -8,7 +8,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 
-
 /*let persons = [
     { 
       "id": 1,
@@ -57,10 +56,10 @@ app.use(express.json());
 app.use(express.static('build'))
 app.use(requestDataSent)
 
-/*app.get('/', (request, response) => {
+app.get('/', (request, response) => {
     console.log('LOG: HTTP 200, home page retrieved');
     response.send('<h1>Welcome to contacts API</h1>');
-})*/
+})
 
 app.get('/info', (request, response) => {
     const date = new Date()
@@ -113,8 +112,6 @@ app.post('/api/persons', (request, response) => {
     const body = request.body;
 
     if (!(body.number && body.name)) {
-
-
         console.log('LOG: HTTP 400, missing information');
         return response.status(400).json({
             error: 'Name or number are missing'
