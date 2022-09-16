@@ -8,33 +8,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 
-/*let persons = [
-	{ 
-	  "id": 1,
-	  "name": "Arto Hellas", 
-	  "number": "040-123456"
-	},
-	{ 
-	  "id": 2,
-	  "name": "Ada Lovelace", 
-	  "number": "39-44-5323523"
-	},
-	{ 
-	  "id": 3,
-	  "name": "Dan Abramov", 
-	  "number": "12-43-234345"
-	},
-	{ 
-	  "id": 4,
-	  "name": "Mary Poppendieck", 
-	  "number": "39-23-6423122"
-	}
-]
-
-const RANDOM_RANGE = 100000000;
-const randomId = () => Math.floor(Math.random() * RANDOM_RANGE) + 4;//+ 4 so randomId func doesn't override id 1-4 */
-
-
 const requestDataSent = (request, response, next) => {
 	request.datasent = request.body;
 	next()
@@ -47,15 +20,15 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-	
+
 	console.log(error.message);
 
 	if(error.name === 'CastError') {
-		return response.status(400).send({ error: 'malformatted id'})
+		return response.status(400).send({ error: 'malformatted id' })
 	} else if (error.name === 'ValidationError') {
-		return response.status(400).send({ error: error.message})
+		return response.status(400).send({ error: error.message })
 	} else if (error.name === 'MatchingNumber') {
-		return response.status(400).send({ error: error.message})
+		return response.status(400).send({ error: error.message })
 	}
 
 	next(error);
@@ -105,17 +78,17 @@ app.get('/api/persons', (request, response, next) => {
 app.get('/api/persons/:id', (request, response, next) => {
 	Person.findById(request.params.id)
 		.then( person => {
-			if (note) {
+			if (person) {
 				response.json(person);
 			} else {
 				response.status(404).end();
 			}
 		})
-		.catch( err => next(err))	
+		.catch( err => next(err))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-	
+
 	Person.findByIdAndDelete(request.params.id)
 		.then( result => {
 			response.status(204).end();
@@ -124,7 +97,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.post('/api/persons', (request, response, next) => {
-	
+
 	const { name, number } = request.body;
 
 	const newPerson = new Person({
@@ -158,9 +131,9 @@ app.put('/api/persons/:id', (request, response, next) => {
 	}
 
 	Person.findByIdAndUpdate(
-		request.params.id, 
-		person, 
-		{ new: true, runValidators: true, context: 'query'})
+		request.params.id,
+		person,
+		{ new: true, runValidators: true, context: 'query' })
 		.then( updatedPerson => {
 			response.json(updatedPerson);
 		})
