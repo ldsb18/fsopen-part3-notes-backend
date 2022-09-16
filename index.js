@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan');
-const note = require('../../Learning/part3/practice/models/note');
 
 const Person = require('./models/person')
 
@@ -115,27 +114,20 @@ app.post('/api/persons', (request, response) => {
 
     if (!(body.number && body.name)) {
 
-        
+
         console.log('LOG: HTTP 400, missing information');
         return response.status(400).json({
             error: 'Name or number are missing'
         })
-    } else if(persons.find(p => p.name === body.name)) {
-        console.log('LOG: HTTP 400, name already exists');
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-    
-    const newPerson = {
-        name: body.name,
-        number: body.number,
-        id: randomId()
     }
 
+    const newPerson = new Person({
+        name: body.name,
+        number: body.number,
+    })
+
     console.log('LOG: HTTP 200, success');
-    persons = persons.concat(newPerson)
-    response.json(newPerson);
+    newPerson.save().then( savedPerson => response.json(savedPerson));
 })
 
 app.use(unknownEndpoint)
